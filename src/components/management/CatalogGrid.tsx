@@ -1,19 +1,15 @@
 "use client";
 
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo } from "react";
 import { useTopPicks } from "@/context/TopPicksContext";
-import { Product } from "@/lib/types";
 import { SearchBar } from "./SearchBar";
 import { CatalogCard } from "./CatalogCard";
 
 export function CatalogGrid() {
-  const { allProducts: rawProducts, activeRegion, selectedPicks, addPick, removePick, isSelected } =
+  const { allProducts: rawProducts, selectedPicks, addPick, removePick, isSelected } =
     useTopPicks();
   const [search, setSearch] = useState("");
   const [activeFlags, setActiveFlags] = useState<Set<string>>(new Set());
-  const [searchResults, setSearchResults] = useState<Product[] | null>(null);
-  const [isSearching, setIsSearching] = useState(false);
-  const abortRef = useRef<AbortController | null>(null);
 
   // Deduplicate products to prevent React key conflicts
   const allProducts = useMemo(() => {
@@ -25,51 +21,27 @@ export function CatalogGrid() {
     });
   }, [rawProducts]);
 
-  // Server-side keyword search with debounce
-  useEffect(() => {
-    if (!search.trim()) {
-      setSearchResults(null);
-      setIsSearching(false);
-      return;
-    }
-
-    setIsSearching(true);
-    const timeout = setTimeout(async () => {
-      abortRef.current?.abort();
-      const controller = new AbortController();
-      abortRef.current = controller;
-
-      try {
-        const res = await fetch(
-          `/api/products/search?region=${activeRegion}&q=${encodeURIComponent(search.trim())}`,
-          { signal: controller.signal }
-        );
-        if (res.ok) {
-          const data = await res.json();
-          setSearchResults(data);
-        }
-      } catch (err) {
-        if (!(err instanceof DOMException && err.name === "AbortError")) {
-          console.error("Search failed:", err);
-        }
-      }
-      setIsSearching(false);
-    }, 300);
-
-    return () => clearTimeout(timeout);
-  }, [search, activeRegion]);
-
-  const baseProducts = searchResults ?? allProducts;
+  // Client-side search filtering
+  const searchFiltered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return allProducts;
+    return allProducts.filter(
+      (p) =>
+        p.title.toLowerCase().includes(q) ||
+        p.author.toLowerCase().includes(q) ||
+        p.blurb.toLowerCase().includes(q)
+    );
+  }, [allProducts, search]);
 
   const flagOptions = useMemo(() => {
     const counts = new Map<string, number>();
-    for (const p of baseProducts) {
+    for (const p of searchFiltered) {
       if (p.flag) counts.set(p.flag, (counts.get(p.flag) ?? 0) + 1);
     }
     return Array.from(counts.entries())
       .sort((a, b) => a[0].localeCompare(b[0]))
       .map(([flag, count]) => ({ flag, count }));
-  }, [baseProducts]);
+  }, [searchFiltered]);
 
   const toggleFlag = (flag: string) => {
     setActiveFlags((prev) => {
@@ -80,7 +52,7 @@ export function CatalogGrid() {
     });
   };
 
-  const filtered = baseProducts.filter((p) => {
+  const filtered = searchFiltered.filter((p) => {
     if (activeFlags.size > 0 && !activeFlags.has(p.flag)) return false;
     return true;
   });
@@ -96,7 +68,7 @@ export function CatalogGrid() {
           {allProducts.length} shown
         </span>
       </div>
-      <SearchBar value={search} onChange={setSearch} isSearching={isSearching} />
+      <SearchBar value={search} onChange={setSearch} />
       {flagOptions.length > 0 && (
         <div className="flex flex-wrap gap-1.5">
           {flagOptions.map(({ flag, count }) => (
