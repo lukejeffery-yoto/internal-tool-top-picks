@@ -1,5 +1,6 @@
 "use client";
 
+import pkg from "../../../package.json";
 import { RegionTabs } from "./RegionTabs";
 import { SelectedPicksList } from "./SelectedPicksList";
 import { CatalogGrid } from "./CatalogGrid";
@@ -11,9 +12,12 @@ export function ManagementPanel() {
   return (
     <div className="flex h-full flex-col">
       <div className="border-b bg-white px-6 py-4">
-        <h1 className="text-lg font-bold text-gray-900">
-          Top Picks Manager
-        </h1>
+        <div className="flex items-baseline justify-between">
+          <h1 className="text-lg font-bold text-gray-900">
+            Top Picks Manager
+          </h1>
+          <span className="text-xs text-gray-400">v{pkg.version}</span>
+        </div>
         <p className="text-sm text-gray-500">
           Select and reorder cards for the Discover tab carousel
         </p>
