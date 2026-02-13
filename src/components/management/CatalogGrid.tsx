@@ -7,13 +7,23 @@ import { SearchBar } from "./SearchBar";
 import { CatalogCard } from "./CatalogCard";
 
 export function CatalogGrid() {
-  const { allProducts, activeRegion, selectedPicks, addPick, removePick, isSelected } =
+  const { allProducts: rawProducts, activeRegion, selectedPicks, addPick, removePick, isSelected } =
     useTopPicks();
   const [search, setSearch] = useState("");
   const [activeFlags, setActiveFlags] = useState<Set<string>>(new Set());
   const [searchResults, setSearchResults] = useState<Product[] | null>(null);
   const [isSearching, setIsSearching] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
+
+  // Deduplicate products to prevent React key conflicts
+  const allProducts = useMemo(() => {
+    const seen = new Set<string>();
+    return rawProducts.filter((p) => {
+      if (seen.has(p.id)) return false;
+      seen.add(p.id);
+      return true;
+    });
+  }, [rawProducts]);
 
   // Server-side keyword search with debounce
   useEffect(() => {
