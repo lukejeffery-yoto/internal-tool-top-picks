@@ -14,8 +14,8 @@
       "Bash(npm install:*)",
       "Bash(python3:*)",
       "Bash(git commit:*)",
-      "Bash(git rebase:*)",
-      "Bash(GIT_EDITOR=true git rebase:*)"
+      "Bash(git pull:*)",
+      "Bash(git stash:*)"
     ]
   }
 }
