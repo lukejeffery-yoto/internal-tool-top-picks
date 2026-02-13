@@ -32,7 +32,7 @@ export function HistoryPanel({ onClose }: { onClose: () => void }) {
       <div className="relative w-full max-w-md bg-white shadow-xl">
         <div className="flex items-center justify-between border-b px-6 py-4">
           <h2 className="text-sm font-semibold text-gray-900">
-            Publish History — {activeRegion}
+            Submission History — {activeRegion}
           </h2>
           <button
             onClick={onClose}
@@ -46,7 +46,7 @@ export function HistoryPanel({ onClose }: { onClose: () => void }) {
             <p className="text-center text-sm text-gray-400">Loading...</p>
           ) : history.length === 0 ? (
             <p className="text-center text-sm text-gray-400">
-              No published versions yet
+              No submissions yet
             </p>
           ) : (
             <div className="flex flex-col gap-3">

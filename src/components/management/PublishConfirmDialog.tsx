@@ -18,11 +18,11 @@ export function PublishConfirmDialog({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
       <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
         <h3 className="text-base font-semibold text-gray-900">
-          Publish Top Picks?
+          Submit Top Picks?
         </h3>
         <p className="mt-1 text-sm text-gray-500">
-          This will make the current {selectedPicks.length} picks live for{" "}
-          {activeRegion}.
+          This will submit your {selectedPicks.length} picks for{" "}
+          {activeRegion} for backend sync.
         </p>
         <div className="mt-4 flex flex-col gap-3">
           <input
@@ -57,7 +57,7 @@ export function PublishConfirmDialog({
             disabled={!publishedBy.trim()}
             className="rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Publish
+            Submit
           </button>
         </div>
       </div>

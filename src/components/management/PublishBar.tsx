@@ -46,7 +46,7 @@ export function PublishBar({ onOpenHistory }: { onOpenHistory: () => void }) {
                     : "bg-green-100 text-green-800"
                 }`}
               >
-                {hasUnpublishedChanges ? "Draft" : "Published"}
+                {hasUnpublishedChanges ? "Draft" : "Submitted"}
               </span>
               {isPublished && (
                 <span
@@ -61,8 +61,8 @@ export function PublishBar({ onOpenHistory }: { onOpenHistory: () => void }) {
               )}
               <span className="text-xs text-gray-500">
                 {lastPublishedAt
-                  ? `Last published ${formatRelativeTime(lastPublishedAt)}${lastPublishedBy ? ` by ${lastPublishedBy}` : ""}`
-                  : "Never published"}
+                  ? `Last submitted ${formatRelativeTime(lastPublishedAt)}${lastPublishedBy ? ` by ${lastPublishedBy}` : ""}`
+                  : "Never submitted"}
               </span>
             </>
           )}
@@ -102,7 +102,7 @@ export function PublishBar({ onOpenHistory }: { onOpenHistory: () => void }) {
             }
             className="rounded-md bg-green-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {isPublishing ? "Publishing..." : "Publish"}
+            {isPublishing ? "Submitting..." : "Submit"}
           </button>
         </div>
       </div>

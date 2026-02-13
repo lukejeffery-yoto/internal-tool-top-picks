@@ -29,7 +29,7 @@ export function PublishedIdsList() {
           className="flex items-center gap-2 text-xs font-medium text-gray-700 hover:text-gray-900"
         >
           <span className="text-[10px]">{expanded ? "▼" : "▶"}</span>
-          Published Product IDs
+          Submitted Product IDs
           <span className="rounded-full bg-gray-200 px-1.5 py-0.5 text-[10px] font-semibold text-gray-600">
             {publishedProductIds.length}
           </span>
