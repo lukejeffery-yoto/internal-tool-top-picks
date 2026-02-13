@@ -3,7 +3,7 @@ import { Product } from "./types";
 const API_BASE = "https://products.api.yotoplay.com/v2/store";
 const PAGE_SIZE = 100;
 
-interface ApiProduct {
+export interface ApiProduct {
   uuid: string;
   yotoHandle: string;
   title: string;
@@ -25,7 +25,7 @@ function stripHtml(html: string): string {
   return html.replace(/<[^>]*>/g, "").trim();
 }
 
-function mapApiProduct(p: ApiProduct): Product {
+export function mapApiProduct(p: ApiProduct): Product {
   const firstCover = p.coverUrls?.[0];
   const firstCard = p.cards?.[0];
 
@@ -88,6 +88,38 @@ export async function fetchProductsForRegion(
     }
   } catch (err) {
     console.error(`Failed to fetch products for ${store}:`, err);
+  }
+
+  return allProducts;
+}
+
+export async function searchProducts(
+  regionCode: string,
+  query: string
+): Promise<Product[]> {
+  const store = regionCode.toLowerCase();
+  const allProducts: Product[] = [];
+  let page = 1;
+  let total = Infinity;
+
+  try {
+    while (allProducts.length < total) {
+      const url = `${API_BASE}/${store}?keywordSearch=${encodeURIComponent(query)}&pageSize=${PAGE_SIZE}&page=${page}`;
+      const res = await fetch(url);
+
+      if (!res.ok) break;
+
+      const json = await res.json();
+      const data = json.data;
+
+      if (!data?.products?.length) break;
+
+      total = data.total;
+      allProducts.push(...data.products.map(mapApiProduct));
+      page++;
+    }
+  } catch (err) {
+    console.error(`Failed to search products for ${store}:`, err);
   }
 
   return allProducts;
