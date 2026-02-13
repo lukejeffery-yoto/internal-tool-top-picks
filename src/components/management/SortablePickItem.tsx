@@ -5,6 +5,7 @@ import { CSS } from "@dnd-kit/utilities";
 import Image from "next/image";
 import { Product } from "@/lib/types";
 import { formatPrice } from "@/lib/format";
+import { useTopPicks } from "@/context/TopPicksContext";
 
 interface SortablePickItemProps {
   product: Product;
@@ -17,6 +18,7 @@ export function SortablePickItem({
   index,
   onRemove,
 }: SortablePickItemProps) {
+  const { activeRegion } = useTopPicks();
   const {
     attributes,
     listeners,
@@ -64,7 +66,7 @@ export function SortablePickItem({
         <p className="truncate text-sm font-medium text-gray-900">
           {product.title}
         </p>
-        <p className="text-xs text-gray-500">{formatPrice(product.price)}</p>
+        <p className="text-xs text-gray-500">{formatPrice(product.price, activeRegion)}</p>
       </div>
       <button
         onClick={onRemove}

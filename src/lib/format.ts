@@ -1,6 +1,17 @@
-export function formatPrice(price: string): string {
+const currencyByRegion: Record<string, string> = {
+  US: "$",
+  CA: "CA$",
+  UK: "£",
+  AU: "A$",
+  EU: "€",
+  FR: "€",
+};
+
+export function formatPrice(price: string, regionCode?: string): string {
   const num = parseFloat(price);
-  return num > 0 ? `£${num.toFixed(2)}` : "";
+  if (num <= 0) return "";
+  const symbol = currencyByRegion[regionCode ?? "UK"] ?? "£";
+  return `${symbol}${num.toFixed(2)}`;
 }
 
 export function formatAgeRange(range: [number | null, number | null]): string {

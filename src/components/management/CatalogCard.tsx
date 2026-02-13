@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { Product } from "@/lib/types";
 import { formatPrice, formatAgeRange } from "@/lib/format";
+import { useTopPicks } from "@/context/TopPicksContext";
 
 interface CatalogCardProps {
   product: Product;
@@ -11,6 +12,7 @@ interface CatalogCardProps {
 }
 
 export function CatalogCard({ product, isSelected, onToggle }: CatalogCardProps) {
+  const { activeRegion } = useTopPicks();
   return (
     <button
       onClick={onToggle}
@@ -52,7 +54,7 @@ export function CatalogCard({ product, isSelected, onToggle }: CatalogCardProps)
           {product.title}
         </h3>
         <p className="text-xs font-semibold text-gray-900">
-          {formatPrice(product.price)}
+          {formatPrice(product.price, activeRegion)}
         </p>
         <div className="flex flex-wrap gap-1">
           {product.contentType.map((ct) => (

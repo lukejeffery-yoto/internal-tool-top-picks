@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { Product } from "@/lib/types";
 import { formatPrice } from "@/lib/format";
+import { useTopPicks } from "@/context/TopPicksContext";
 
 interface PreviewCardProps {
   product: Product;
@@ -10,6 +11,7 @@ interface PreviewCardProps {
 }
 
 export function PreviewCard({ product, size }: PreviewCardProps) {
+  const { activeRegion } = useTopPicks();
   if (size === "small") {
     return (
       <div className="flex w-[100px] shrink-0 flex-col gap-1">
@@ -37,7 +39,7 @@ export function PreviewCard({ product, size }: PreviewCardProps) {
             </svg>
           </div>
           <span className="text-[8px] font-medium text-white">
-            {formatPrice(product.price)}
+            {formatPrice(product.price, activeRegion)}
           </span>
         </div>
         {product.clubCredits > 0 && (
@@ -79,7 +81,7 @@ export function PreviewCard({ product, size }: PreviewCardProps) {
           </svg>
         </div>
         <span className="text-[10px] font-medium text-white">
-          {formatPrice(product.price)}
+          {formatPrice(product.price, activeRegion)}
         </span>
       </div>
       {product.clubCredits > 0 && (
