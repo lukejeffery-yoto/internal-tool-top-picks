@@ -4,6 +4,7 @@ import { useState } from "react";
 import pkg from "../../../package.json";
 import { RegionTabs } from "./RegionTabs";
 import { PublishBar } from "./PublishBar";
+import { PublishedIdsList } from "./PublishedIdsList";
 import { SelectedPicksList } from "./SelectedPicksList";
 import { CatalogGrid } from "./CatalogGrid";
 import { HistoryPanel } from "./HistoryPanel";
@@ -28,6 +29,7 @@ export function ManagementPanel() {
       </div>
       <RegionTabs />
       <PublishBar onOpenHistory={() => setShowHistory(true)} />
+      <PublishedIdsList />
       <div className="flex-1 overflow-y-auto p-6">
         {allProducts.length === 0 ? (
           <div className="flex h-40 items-center justify-center">

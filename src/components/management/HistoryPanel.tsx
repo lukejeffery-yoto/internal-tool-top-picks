@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useTopPicks } from "@/context/TopPicksContext";
 import { formatRelativeTime } from "@/lib/format";
+import { copyIdsToClipboard, downloadIdsCsv } from "@/lib/export";
 
 export function HistoryPanel({ onClose }: { onClose: () => void }) {
   const {
@@ -13,10 +14,17 @@ export function HistoryPanel({ onClose }: { onClose: () => void }) {
     isRestoring,
     activeRegion,
   } = useTopPicks();
+  const [copiedId, setCopiedId] = useState<number | null>(null);
 
   useEffect(() => {
     loadHistory();
   }, [loadHistory]);
+
+  const handleCopy = async (versionId: number, ids: string[]) => {
+    await copyIdsToClipboard(ids);
+    setCopiedId(versionId);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
@@ -62,13 +70,37 @@ export function HistoryPanel({ onClose }: { onClose: () => void }) {
                         </p>
                       )}
                     </div>
-                    <button
-                      onClick={() => restoreVersion(version.id)}
-                      disabled={isRestoring}
-                      className="shrink-0 rounded-md px-3 py-1 text-xs font-medium text-gray-600 hover:bg-gray-100 disabled:opacity-50"
-                    >
-                      {isRestoring ? "Restoring..." : "Restore to Draft"}
-                    </button>
+                    <div className="flex shrink-0 flex-col gap-1">
+                      <button
+                        onClick={() => restoreVersion(version.id)}
+                        disabled={isRestoring}
+                        className="rounded-md px-3 py-1 text-xs font-medium text-gray-600 hover:bg-gray-100 disabled:opacity-50"
+                      >
+                        {isRestoring ? "Restoring..." : "Restore to Draft"}
+                      </button>
+                      <div className="flex gap-1">
+                        <button
+                          onClick={() =>
+                            handleCopy(version.id, version.productIds)
+                          }
+                          className="rounded-md px-2 py-1 text-[11px] font-medium text-gray-500 hover:bg-gray-100"
+                        >
+                          {copiedId === version.id ? "Copied!" : "Copy IDs"}
+                        </button>
+                        <button
+                          onClick={() =>
+                            downloadIdsCsv(
+                              version.productIds,
+                              activeRegion,
+                              version.publishedAt.slice(0, 10)
+                            )
+                          }
+                          className="rounded-md px-2 py-1 text-[11px] font-medium text-gray-500 hover:bg-gray-100"
+                        >
+                          CSV
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               ))}
