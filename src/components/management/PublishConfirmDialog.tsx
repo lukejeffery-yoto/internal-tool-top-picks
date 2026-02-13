@@ -32,23 +32,17 @@ export function PublishConfirmDialog({
             onChange={(e) => setNote(e.target.value)}
             className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:outline-none"
           />
-          <div>
+          <div className="flex items-center rounded-md border border-gray-300 focus-within:border-gray-500">
             <input
-              type="email"
-              placeholder="Your Yoto email"
+              type="text"
+              placeholder="first.last"
               value={publishedBy}
               onChange={(e) => setPublishedBy(e.target.value)}
-              className={`w-full rounded-md border px-3 py-2 text-sm focus:outline-none ${
-                publishedBy && !publishedBy.endsWith("@yotoplay.com")
-                  ? "border-red-300 focus:border-red-500"
-                  : "border-gray-300 focus:border-gray-500"
-              }`}
+              className="min-w-0 flex-1 rounded-l-md px-3 py-2 text-sm focus:outline-none"
             />
-            {publishedBy && !publishedBy.endsWith("@yotoplay.com") && (
-              <p className="mt-1 text-xs text-red-500">
-                Must be a @yotoplay.com email
-              </p>
-            )}
+            <span className="whitespace-nowrap border-l border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-500">
+              @yotoplay.com
+            </span>
           </div>
         </div>
         <div className="mt-5 flex justify-end gap-2">
@@ -59,8 +53,8 @@ export function PublishConfirmDialog({
             Cancel
           </button>
           <button
-            onClick={() => onConfirm(note, publishedBy)}
-            disabled={!publishedBy.endsWith("@yotoplay.com")}
+            onClick={() => onConfirm(note, `${publishedBy}@yotoplay.com`)}
+            disabled={!publishedBy.trim()}
             className="rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
             Publish
