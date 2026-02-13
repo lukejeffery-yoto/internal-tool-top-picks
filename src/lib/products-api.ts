@@ -67,7 +67,7 @@ export async function fetchProductsForRegion(
   }
 
   try {
-    const url = `${API_BASE}/${config.apiRegion}?collection=library&pageSize=1500`;
+    const url = `${API_BASE}/${config.apiRegion}?collection=library&pageSize=2000`;
     const res = await fetch(url, {
       headers: { authorization: config.apiKey },
       next: { revalidate: 3600 },
