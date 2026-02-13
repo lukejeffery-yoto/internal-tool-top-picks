@@ -25,6 +25,15 @@ function stripHtml(html: string): string {
   return html.replace(/<[^>]*>/g, "").trim();
 }
 
+function dedup(products: Product[]): Product[] {
+  const seen = new Set<string>();
+  return products.filter((p) => {
+    if (seen.has(p.id)) return false;
+    seen.add(p.id);
+    return true;
+  });
+}
+
 export function mapApiProduct(p: ApiProduct): Product {
   const firstCover = p.coverUrls?.[0];
   const firstCard = p.cards?.[0];
@@ -90,7 +99,7 @@ export async function fetchProductsForRegion(
     console.error(`Failed to fetch products for ${store}:`, err);
   }
 
-  return allProducts;
+  return dedup(allProducts);
 }
 
 export async function searchProducts(
@@ -122,5 +131,5 @@ export async function searchProducts(
     console.error(`Failed to search products for ${store}:`, err);
   }
 
-  return allProducts;
+  return dedup(allProducts);
 }
