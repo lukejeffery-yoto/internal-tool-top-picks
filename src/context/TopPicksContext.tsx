@@ -10,8 +10,7 @@ import {
   ReactNode,
 } from "react";
 import { Product, PickVersion } from "@/lib/types";
-import { RegionCode } from "@/lib/data";
-import { Region } from "@/lib/mock-products";
+import { RegionCode, Region } from "@/lib/data";
 
 interface TopPicksContextValue {
   regions: Region[];

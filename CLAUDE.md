@@ -32,12 +32,12 @@ Internal tool for Yoto's ecomm team to manage the "Top Picks" carousel on the Di
 - `src/app/api/picks/[region]/restore/` — POST to restore a historical version to draft
 - `src/app/api/picks/[region]/sync/` — POST to mark latest version as live (synced)
 - `src/app/api/notify/` — POST to send Slack notification for all pending (unsynced) regions
-- `src/lib/` — data layer, types, DB access, mock product data
+- `src/lib/` — data layer, types, DB access, product API
 - `src/lib/db.ts` — Neon Postgres queries (schema auto-creates via `ensureSchema()`)
 - `src/lib/types.ts` — TypeScript interfaces (`PickVersion`, `Product`)
 - `src/lib/slack.ts` — Slack API helpers (channel notifications, user lookup, DMs)
-- `src/lib/mock-products.ts` — scraped product data per region
-- `src/lib/data.ts` — region/product accessors, re-exports `RegionCode`
+- `src/lib/products-api.ts` — fetches products from `products.api.yotoplay.com`, paginates, maps to `Product` interface
+- `src/lib/data.ts` — region definitions (`RegionCode`, `Region`, `regions`), product accessors using products-api
 - `src/lib/format.ts` — `formatRelativeTime()` utility
 - `src/lib/export.ts` — `copyIdsToClipboard()` and `downloadIdsJson()` utilities
 - `src/context/TopPicksContext.tsx` — shared state for picks, regions, publish, sync
