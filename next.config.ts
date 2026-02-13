@@ -8,6 +8,11 @@ const nextConfig: NextConfig = {
         hostname: "cdn.shopify.com",
         pathname: "/s/files/**",
       },
+      {
+        protocol: "https",
+        hostname: "card-content.yotoplay.com",
+        pathname: "/yoto/**",
+      },
     ],
   },
 };
