@@ -22,6 +22,7 @@ export async function GET(
     productIds,
     publishedProductIds: latestPublished?.productIds ?? null,
     lastPublishedAt: latestPublished?.publishedAt ?? null,
+    lastPublishedBy: latestPublished?.publishedBy ?? null,
   });
 }
 

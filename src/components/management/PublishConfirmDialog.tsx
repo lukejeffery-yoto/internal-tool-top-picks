@@ -32,13 +32,24 @@ export function PublishConfirmDialog({
             onChange={(e) => setNote(e.target.value)}
             className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:outline-none"
           />
-          <input
-            type="text"
-            placeholder="Your name (optional)"
-            value={publishedBy}
-            onChange={(e) => setPublishedBy(e.target.value)}
-            className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:outline-none"
-          />
+          <div>
+            <input
+              type="email"
+              placeholder="Your Yoto email"
+              value={publishedBy}
+              onChange={(e) => setPublishedBy(e.target.value)}
+              className={`w-full rounded-md border px-3 py-2 text-sm focus:outline-none ${
+                publishedBy && !publishedBy.endsWith("@yotoplay.com")
+                  ? "border-red-300 focus:border-red-500"
+                  : "border-gray-300 focus:border-gray-500"
+              }`}
+            />
+            {publishedBy && !publishedBy.endsWith("@yotoplay.com") && (
+              <p className="mt-1 text-xs text-red-500">
+                Must be a @yotoplay.com email
+              </p>
+            )}
+          </div>
         </div>
         <div className="mt-5 flex justify-end gap-2">
           <button
@@ -49,7 +60,8 @@ export function PublishConfirmDialog({
           </button>
           <button
             onClick={() => onConfirm(note, publishedBy)}
-            className="rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700"
+            disabled={!publishedBy.endsWith("@yotoplay.com")}
+            className="rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
             Publish
           </button>

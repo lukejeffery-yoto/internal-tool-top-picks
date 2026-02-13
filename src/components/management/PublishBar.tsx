@@ -9,6 +9,7 @@ export function PublishBar({ onOpenHistory }: { onOpenHistory: () => void }) {
   const {
     hasUnpublishedChanges,
     lastPublishedAt,
+    lastPublishedBy,
     isPublishing,
     publishPicks,
     selectedPicks,
@@ -30,7 +31,7 @@ export function PublishBar({ onOpenHistory }: { onOpenHistory: () => void }) {
           </span>
           <span className="text-xs text-gray-500">
             {lastPublishedAt
-              ? `Last published ${formatRelativeTime(lastPublishedAt)}`
+              ? `Last published ${formatRelativeTime(lastPublishedAt)}${lastPublishedBy ? ` by ${lastPublishedBy}` : ""}`
               : "Never published"}
           </span>
         </div>

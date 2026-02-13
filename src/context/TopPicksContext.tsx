@@ -29,6 +29,7 @@ interface TopPicksContextValue {
   // Draft vs published
   publishedProductIds: string[] | null;
   lastPublishedAt: string | null;
+  lastPublishedBy: string | null;
   hasUnpublishedChanges: boolean;
 
   // Publish
@@ -71,6 +72,9 @@ export function TopPicksProvider({
   const [lastPublishedAtByRegion, setLastPublishedAtByRegion] = useState<
     Record<string, string | null>
   >({});
+  const [lastPublishedByByRegion, setLastPublishedByByRegion] = useState<
+    Record<string, string | null>
+  >({});
   const [isPublishing, setIsPublishing] = useState(false);
 
   // History state
@@ -84,6 +88,7 @@ export function TopPicksProvider({
   const selectedPicks = picksByRegion[activeRegion] || [];
   const publishedProductIds = publishedByRegion[activeRegion] ?? null;
   const lastPublishedAt = lastPublishedAtByRegion[activeRegion] ?? null;
+  const lastPublishedBy = lastPublishedByByRegion[activeRegion] ?? null;
 
   const hasUnpublishedChanges = useMemo(() => {
     const draftIds = selectedPicks.map((p) => p.id);
@@ -115,6 +120,10 @@ export function TopPicksProvider({
           setLastPublishedAtByRegion((prev) => ({
             ...prev,
             [region]: data.lastPublishedAt ?? null,
+          }));
+          setLastPublishedByByRegion((prev) => ({
+            ...prev,
+            [region]: data.lastPublishedBy ?? null,
           }));
           setLoadedRegions((prev) => new Set(prev).add(region));
         }
@@ -228,6 +237,10 @@ export function TopPicksProvider({
             ...prev,
             [activeRegion]: new Date().toISOString(),
           }));
+          setLastPublishedByByRegion((prev) => ({
+            ...prev,
+            [activeRegion]: publishedBy || null,
+          }));
         } else {
           const err = await res.json().catch(() => ({}));
           console.error("Publish failed:", res.status, err);
@@ -297,6 +310,7 @@ export function TopPicksProvider({
         isLoading,
         publishedProductIds,
         lastPublishedAt,
+        lastPublishedBy,
         hasUnpublishedChanges,
         isPublishing,
         publishPicks: publishPicksAction,
