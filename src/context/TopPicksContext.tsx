@@ -25,6 +25,9 @@ interface TopPicksContextValue {
   isSaving: boolean;
   isLoading: boolean;
 
+  // Handle → Shopify ID lookup for exports
+  getShopifyIds: (handles: string[]) => string[];
+
   // Draft vs published
   publishedProductIds: string[] | null;
   lastPublishedAt: string | null;
@@ -108,6 +111,17 @@ export function TopPicksProvider({
     () => new Set(topPicksByRegion[activeRegion] ?? []),
     [topPicksByRegion, activeRegion]
   );
+  const shopifyIdMap = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const p of allProducts) map.set(p.id, p.shopifyId);
+    return map;
+  }, [allProducts]);
+
+  const getShopifyIds = useCallback(
+    (handles: string[]) => handles.map((h) => shopifyIdMap.get(h) ?? h),
+    [shopifyIdMap]
+  );
+
   const publishedProductIds = publishedByRegion[activeRegion] ?? null;
   const lastPublishedAt = lastPublishedAtByRegion[activeRegion] ?? null;
   const lastPublishedBy = lastPublishedByByRegion[activeRegion] ?? null;
@@ -374,6 +388,7 @@ export function TopPicksProvider({
         isSelected,
         isSaving,
         isLoading,
+        getShopifyIds,
         publishedProductIds,
         lastPublishedAt,
         lastPublishedBy,

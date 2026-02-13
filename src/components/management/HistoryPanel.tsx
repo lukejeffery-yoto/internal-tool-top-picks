@@ -13,6 +13,7 @@ export function HistoryPanel({ onClose }: { onClose: () => void }) {
     restoreVersion,
     isRestoring,
     activeRegion,
+    getShopifyIds,
   } = useTopPicks();
   const [copiedId, setCopiedId] = useState<number | null>(null);
 
@@ -92,7 +93,7 @@ export function HistoryPanel({ onClose }: { onClose: () => void }) {
                       <div className="flex gap-1">
                         <button
                           onClick={() =>
-                            handleCopy(version.id, version.productIds)
+                            handleCopy(version.id, getShopifyIds(version.productIds))
                           }
                           className="rounded-md px-2 py-1 text-[11px] font-medium text-gray-500 hover:bg-gray-100"
                         >
@@ -101,7 +102,7 @@ export function HistoryPanel({ onClose }: { onClose: () => void }) {
                         <button
                           onClick={() =>
                             downloadIdsJson(
-                              version.productIds,
+                              getShopifyIds(version.productIds),
                               activeRegion,
                               version.publishedAt.slice(0, 10)
                             )

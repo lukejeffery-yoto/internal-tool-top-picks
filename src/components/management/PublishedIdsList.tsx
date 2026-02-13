@@ -5,20 +5,22 @@ import { useTopPicks } from "@/context/TopPicksContext";
 import { copyIdsToClipboard, downloadIdsJson } from "@/lib/export";
 
 export function PublishedIdsList() {
-  const { publishedProductIds, activeRegion } = useTopPicks();
+  const { publishedProductIds, activeRegion, getShopifyIds } = useTopPicks();
   const [expanded, setExpanded] = useState(false);
   const [copied, setCopied] = useState(false);
 
   if (!publishedProductIds || publishedProductIds.length === 0) return null;
 
+  const shopifyIds = getShopifyIds(publishedProductIds);
+
   const handleCopy = async () => {
-    await copyIdsToClipboard(publishedProductIds);
+    await copyIdsToClipboard(shopifyIds);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
   const handleDownload = () => {
-    downloadIdsJson(publishedProductIds, activeRegion);
+    downloadIdsJson(shopifyIds, activeRegion);
   };
 
   return (
@@ -51,7 +53,7 @@ export function PublishedIdsList() {
       </div>
       {expanded && (
         <pre className="mt-2 max-h-40 overflow-y-auto rounded bg-white p-2 font-mono text-xs text-gray-800 border border-gray-200">
-          {publishedProductIds.join("\n")}
+          {shopifyIds.join("\n")}
         </pre>
       )}
     </div>

@@ -14,6 +14,7 @@ const REGION_CONFIG: Record<string, { apiRegion: string; apiKey: string }> = {
 };
 
 interface WebsiteProduct {
+  id: string;
   handle: string;
   title: string;
   variants?: Array<{ sku?: string }>;
@@ -40,6 +41,7 @@ interface WebsiteProduct {
 function mapWebsiteProduct(p: WebsiteProduct): Product {
   return {
     id: p.handle,
+    shopifyId: p.id,
     handle: p.handle,
     sku: p.variants?.[0]?.sku ?? "",
     title: p.title,

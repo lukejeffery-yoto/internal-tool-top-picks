@@ -10,6 +10,7 @@ export interface PickVersion {
 
 export interface Product {
   id: string;
+  shopifyId: string;
   handle: string;
   sku: string;
   title: string;
