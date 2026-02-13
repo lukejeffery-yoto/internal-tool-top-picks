@@ -19,7 +19,7 @@ export function ManagementPanel() {
       <div className="border-b bg-white px-6 py-4">
         <div className="flex items-baseline justify-between">
           <h1 className="text-lg font-bold text-gray-900">
-            Top Picks Manager
+            Yoto App Top Picks Manager
           </h1>
           <span className="text-xs text-gray-400">v{pkg.version}</span>
         </div>

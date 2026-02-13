@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Yoto Top Picks Manager",
+  title: "Yoto App Top Picks Manager",
   description: "Internal tool for managing the Top Picks carousel",
 };
 
