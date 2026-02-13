@@ -6,10 +6,11 @@ import { SearchBar } from "./SearchBar";
 import { CatalogCard } from "./CatalogCard";
 
 export function CatalogGrid() {
-  const { allProducts: rawProducts, selectedPicks, addPick, removePick, isSelected } =
+  const { allProducts: rawProducts, selectedPicks, addPick, removePick, isSelected, topPicksHandles } =
     useTopPicks();
   const [search, setSearch] = useState("");
   const [activeFlags, setActiveFlags] = useState<Set<string>>(new Set());
+  const [showTopPicksOnly, setShowTopPicksOnly] = useState(false);
 
   // Deduplicate products to prevent React key conflicts
   const allProducts = useMemo(() => {
@@ -54,6 +55,7 @@ export function CatalogGrid() {
   };
 
   const filtered = searchFiltered.filter((p) => {
+    if (showTopPicksOnly && !topPicksHandles.has(p.handle)) return false;
     if (activeFlags.size > 0 && !activeFlags.has(p.flag)) return false;
     return true;
   });
@@ -70,6 +72,18 @@ export function CatalogGrid() {
         </span>
       </div>
       <SearchBar value={search} onChange={setSearch} />
+      {topPicksHandles.size > 0 && (
+        <button
+          onClick={() => setShowTopPicksOnly((v) => !v)}
+          className={`self-start rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
+            showTopPicksOnly
+              ? "bg-blue-500 text-white"
+              : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+          }`}
+        >
+          Shopify Top Picks ({topPicksHandles.size})
+        </button>
+      )}
       {flagOptions.length > 0 && (
         <div className="flex flex-wrap gap-1.5">
           {flagOptions.map(({ flag, count }) => (
@@ -112,7 +126,7 @@ export function CatalogGrid() {
       </div>
       {filtered.length === 0 && (
         <p className="py-8 text-center text-sm text-gray-500">
-          {search || activeFlags.size > 0
+          {search || activeFlags.size > 0 || showTopPicksOnly
             ? "No cards match the current filters"
             : "No cards available"}
         </p>

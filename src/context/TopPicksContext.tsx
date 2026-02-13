@@ -44,6 +44,9 @@ interface TopPicksContextValue {
   isRestoring: boolean;
   restoreVersion: (versionId: number) => Promise<void>;
 
+  // Shopify top-picks collection handles
+  topPicksHandles: Set<string>;
+
   // Sync
   syncedAt: string | null;
   isSyncing: boolean;
@@ -57,10 +60,12 @@ const TopPicksContext = createContext<TopPicksContextValue | null>(null);
 export function TopPicksProvider({
   regionList,
   productsByRegion,
+  topPicksByRegion,
   children,
 }: {
   regionList: Region[];
   productsByRegion: Record<RegionCode, Product[]>;
+  topPicksByRegion: Record<string, string[]>;
   children: ReactNode;
 }) {
   const [activeRegion, setActiveRegionRaw] = useState<RegionCode>("UK");
@@ -99,6 +104,10 @@ export function TopPicksProvider({
 
   const allProducts = productsByRegion[activeRegion] || [];
   const selectedPicks = picksByRegion[activeRegion] || [];
+  const topPicksHandles = useMemo(
+    () => new Set(topPicksByRegion[activeRegion] ?? []),
+    [topPicksByRegion, activeRegion]
+  );
   const publishedProductIds = publishedByRegion[activeRegion] ?? null;
   const lastPublishedAt = lastPublishedAtByRegion[activeRegion] ?? null;
   const lastPublishedBy = lastPublishedByByRegion[activeRegion] ?? null;
@@ -376,6 +385,7 @@ export function TopPicksProvider({
         loadHistory,
         isRestoring,
         restoreVersion,
+        topPicksHandles,
         syncedAt,
         isSyncing,
         markAsLive,

@@ -1,5 +1,5 @@
 import { Product } from "./types";
-import { fetchProductsForRegion } from "./products-api";
+import { fetchProductsForRegion, fetchCollectionHandles } from "./products-api";
 
 export type RegionCode = "US" | "CA" | "UK" | "AU" | "EU" | "FR";
 
@@ -37,4 +37,19 @@ export async function getAllRegionProducts(): Promise<
   return Object.fromEntries(
     results.map((r) => [r.code, r.products])
   ) as Record<RegionCode, Product[]>;
+}
+
+export async function getAllRegionTopPicksHandles(): Promise<
+  Record<RegionCode, Set<string>>
+> {
+  const results = await Promise.all(
+    regions.map(async (r) => ({
+      code: r.code,
+      handles: await fetchCollectionHandles(r.code, "top-picks"),
+    }))
+  );
+
+  return Object.fromEntries(
+    results.map((r) => [r.code, r.handles])
+  ) as Record<RegionCode, Set<string>>;
 }

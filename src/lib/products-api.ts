@@ -59,6 +59,30 @@ function mapWebsiteProduct(p: WebsiteProduct): Product {
   };
 }
 
+export async function fetchCollectionHandles(
+  regionCode: string,
+  collection: string
+): Promise<Set<string>> {
+  const config = REGION_CONFIG[regionCode.toUpperCase()];
+  if (!config) return new Set();
+
+  try {
+    const url = `${API_BASE}/${config.apiRegion}?collection=${encodeURIComponent(collection)}&pageSize=2000`;
+    const res = await fetch(url, {
+      headers: { authorization: config.apiKey },
+      next: { revalidate: 3600 },
+    });
+
+    if (!res.ok) return new Set();
+
+    const json = await res.json();
+    const products: Array<{ handle: string }> = json.data?.products ?? [];
+    return new Set(products.map((p) => p.handle));
+  } catch {
+    return new Set();
+  }
+}
+
 export async function fetchProductsForRegion(
   regionCode: string
 ): Promise<Product[]> {
