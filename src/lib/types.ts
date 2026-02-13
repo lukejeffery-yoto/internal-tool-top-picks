@@ -11,6 +11,7 @@ export interface PickVersion {
 export interface Product {
   id: string;
   handle: string;
+  sku: string;
   title: string;
   price: string;
   comparePrice: string;

@@ -29,7 +29,8 @@ export function CatalogGrid() {
       (p) =>
         p.title.toLowerCase().includes(q) ||
         p.author.toLowerCase().includes(q) ||
-        p.blurb.toLowerCase().includes(q)
+        p.blurb.toLowerCase().includes(q) ||
+        p.sku.toLowerCase().includes(q)
     );
   }, [allProducts, search]);
 

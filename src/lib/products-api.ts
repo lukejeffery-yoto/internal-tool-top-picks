@@ -16,6 +16,7 @@ const REGION_CONFIG: Record<string, { apiRegion: string; apiKey: string }> = {
 interface WebsiteProduct {
   handle: string;
   title: string;
+  variants?: Array<{ sku?: string }>;
   price: string;
   comparePrice?: number | string | null;
   ageRange: [number | null, number | null];
@@ -40,6 +41,7 @@ function mapWebsiteProduct(p: WebsiteProduct): Product {
   return {
     id: p.handle,
     handle: p.handle,
+    sku: p.variants?.[0]?.sku ?? "",
     title: p.title,
     price: p.price,
     comparePrice: p.comparePrice?.toString() ?? "",
