@@ -1,14 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getPicksForRegion, savePicksForRegion, ensureSchema } from "@/lib/db";
+import {
+  getPicksForRegion,
+  savePicksForRegion,
+  getLatestPublishedPicks,
+  ensureSchema,
+} from "@/lib/db";
 
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ region: string }> }
 ) {
   const { region } = await params;
+  const regionCode = region.toUpperCase();
   await ensureSchema();
-  const productIds = await getPicksForRegion(region.toUpperCase());
-  return NextResponse.json({ region: region.toUpperCase(), productIds });
+  const [productIds, latestPublished] = await Promise.all([
+    getPicksForRegion(regionCode),
+    getLatestPublishedPicks(regionCode),
+  ]);
+  return NextResponse.json({
+    region: regionCode,
+    productIds,
+    publishedProductIds: latestPublished?.productIds ?? null,
+    lastPublishedAt: latestPublished?.publishedAt ?? null,
+  });
 }
 
 export async function PUT(

@@ -1,3 +1,12 @@
+export interface PickVersion {
+  id: number;
+  regionCode: string;
+  productIds: string[];
+  note: string;
+  publishedBy: string;
+  publishedAt: string;
+}
+
 export interface Product {
   id: string;
   handle: string;

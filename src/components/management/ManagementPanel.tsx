@@ -1,13 +1,17 @@
 "use client";
 
+import { useState } from "react";
 import pkg from "../../../package.json";
 import { RegionTabs } from "./RegionTabs";
+import { PublishBar } from "./PublishBar";
 import { SelectedPicksList } from "./SelectedPicksList";
 import { CatalogGrid } from "./CatalogGrid";
+import { HistoryPanel } from "./HistoryPanel";
 import { useTopPicks } from "@/context/TopPicksContext";
 
 export function ManagementPanel() {
   const { activeRegion, allProducts } = useTopPicks();
+  const [showHistory, setShowHistory] = useState(false);
 
   return (
     <div className="flex h-full flex-col">
@@ -23,6 +27,7 @@ export function ManagementPanel() {
         </p>
       </div>
       <RegionTabs />
+      <PublishBar onOpenHistory={() => setShowHistory(true)} />
       <div className="flex-1 overflow-y-auto p-6">
         {allProducts.length === 0 ? (
           <div className="flex h-40 items-center justify-center">
@@ -39,6 +44,9 @@ export function ManagementPanel() {
           </div>
         )}
       </div>
+      {showHistory && (
+        <HistoryPanel onClose={() => setShowHistory(false)} />
+      )}
     </div>
   );
 }
