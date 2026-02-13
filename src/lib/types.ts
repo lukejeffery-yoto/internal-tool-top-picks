@@ -5,6 +5,7 @@ export interface PickVersion {
   note: string;
   publishedBy: string;
   publishedAt: string;
+  syncedAt: string | null;
 }
 
 export interface Product {

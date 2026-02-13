@@ -54,6 +54,10 @@ export async function ensureSchema() {
     CREATE INDEX IF NOT EXISTS idx_pick_versions_region
     ON pick_versions(region_code, published_at DESC)
   `;
+  await sql`
+    ALTER TABLE pick_versions
+    ADD COLUMN IF NOT EXISTS synced_at TIMESTAMPTZ DEFAULT NULL
+  `;
 }
 
 export async function getPicksForRegion(
@@ -95,7 +99,7 @@ export async function publishPicks(
   const rows = await sql`
     INSERT INTO pick_versions (region_code, product_ids, note, published_by)
     VALUES (${regionCode}, ${productIdsJson}, ${note}, ${publishedBy})
-    RETURNING id, region_code, product_ids, note, published_by, published_at
+    RETURNING id, region_code, product_ids, note, published_by, published_at, synced_at
   `;
   const row = rows[0];
   return {
@@ -105,6 +109,7 @@ export async function publishPicks(
     note: row.note,
     publishedBy: row.published_by,
     publishedAt: row.published_at,
+    syncedAt: row.synced_at,
   };
 }
 
@@ -114,7 +119,7 @@ export async function getPickVersions(
 ): Promise<PickVersion[]> {
   const sql = getDb();
   const rows = await sql`
-    SELECT id, region_code, product_ids, note, published_by, published_at
+    SELECT id, region_code, product_ids, note, published_by, published_at, synced_at
     FROM pick_versions
     WHERE region_code = ${regionCode}
     ORDER BY published_at DESC
@@ -127,6 +132,7 @@ export async function getPickVersions(
     note: row.note,
     publishedBy: row.published_by,
     publishedAt: row.published_at,
+    syncedAt: row.synced_at,
   }));
 }
 
@@ -135,7 +141,7 @@ export async function getLatestPublishedPicks(
 ): Promise<PickVersion | null> {
   const sql = getDb();
   const rows = await sql`
-    SELECT id, region_code, product_ids, note, published_by, published_at
+    SELECT id, region_code, product_ids, note, published_by, published_at, synced_at
     FROM pick_versions
     WHERE region_code = ${regionCode}
     ORDER BY published_at DESC
@@ -150,5 +156,55 @@ export async function getLatestPublishedPicks(
     note: row.note,
     publishedBy: row.published_by,
     publishedAt: row.published_at,
+    syncedAt: row.synced_at,
   };
+}
+
+export async function markVersionSynced(
+  regionCode: string
+): Promise<PickVersion | null> {
+  const sql = getDb();
+  const rows = await sql`
+    UPDATE pick_versions
+    SET synced_at = NOW()
+    WHERE id = (
+      SELECT id FROM pick_versions
+      WHERE region_code = ${regionCode}
+      ORDER BY published_at DESC
+      LIMIT 1
+    )
+    RETURNING id, region_code, product_ids, note, published_by, published_at, synced_at
+  `;
+  if (rows.length === 0) return null;
+  const row = rows[0];
+  return {
+    id: row.id,
+    regionCode: row.region_code,
+    productIds: parseProductIds(row.product_ids),
+    note: row.note,
+    publishedBy: row.published_by,
+    publishedAt: row.published_at,
+    syncedAt: row.synced_at,
+  };
+}
+
+export async function getPendingRegions(): Promise<PickVersion[]> {
+  const sql = getDb();
+  const rows = await sql`
+    SELECT DISTINCT ON (region_code)
+      id, region_code, product_ids, note, published_by, published_at, synced_at
+    FROM pick_versions
+    ORDER BY region_code, published_at DESC
+  `;
+  return rows
+    .filter((row) => row.synced_at === null)
+    .map((row) => ({
+      id: row.id,
+      regionCode: row.region_code,
+      productIds: parseProductIds(row.product_ids),
+      note: row.note,
+      publishedBy: row.published_by,
+      publishedAt: row.published_at,
+      syncedAt: row.synced_at,
+    }));
 }

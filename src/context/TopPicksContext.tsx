@@ -44,6 +44,13 @@ interface TopPicksContextValue {
   // Restore
   isRestoring: boolean;
   restoreVersion: (versionId: number) => Promise<void>;
+
+  // Sync
+  syncedAt: string | null;
+  isSyncing: boolean;
+  markAsLive: () => Promise<void>;
+  isNotifying: boolean;
+  notifyBackend: () => Promise<{ notified: boolean; message: string }>;
 }
 
 const TopPicksContext = createContext<TopPicksContextValue | null>(null);
@@ -84,11 +91,19 @@ export function TopPicksProvider({
   // Restore state
   const [isRestoring, setIsRestoring] = useState(false);
 
+  // Sync state
+  const [syncedAtByRegion, setSyncedAtByRegion] = useState<
+    Record<string, string | null>
+  >({});
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [isNotifying, setIsNotifying] = useState(false);
+
   const allProducts = productsByRegion[activeRegion] || [];
   const selectedPicks = picksByRegion[activeRegion] || [];
   const publishedProductIds = publishedByRegion[activeRegion] ?? null;
   const lastPublishedAt = lastPublishedAtByRegion[activeRegion] ?? null;
   const lastPublishedBy = lastPublishedByByRegion[activeRegion] ?? null;
+  const syncedAt = syncedAtByRegion[activeRegion] ?? null;
 
   const hasUnpublishedChanges = useMemo(() => {
     const draftIds = selectedPicks.map((p) => p.id);
@@ -124,6 +139,10 @@ export function TopPicksProvider({
           setLastPublishedByByRegion((prev) => ({
             ...prev,
             [region]: data.lastPublishedBy ?? null,
+          }));
+          setSyncedAtByRegion((prev) => ({
+            ...prev,
+            [region]: data.syncedAt ?? null,
           }));
           setLoadedRegions((prev) => new Set(prev).add(region));
         }
@@ -241,6 +260,10 @@ export function TopPicksProvider({
             ...prev,
             [activeRegion]: publishedBy || null,
           }));
+          setSyncedAtByRegion((prev) => ({
+            ...prev,
+            [activeRegion]: null,
+          }));
         } else {
           const err = await res.json().catch(() => ({}));
           console.error("Publish failed:", res.status, err);
@@ -294,6 +317,41 @@ export function TopPicksProvider({
     [activeRegion, productsByRegion]
   );
 
+  // Mark current region as live (synced)
+  const markAsLive = useCallback(async () => {
+    setIsSyncing(true);
+    try {
+      const res = await fetch(`/api/picks/${activeRegion}/sync`, {
+        method: "POST",
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setSyncedAtByRegion((prev) => ({
+          ...prev,
+          [activeRegion]: data.version.syncedAt,
+        }));
+      }
+    } catch (err) {
+      console.error("Mark as live error:", err);
+    }
+    setIsSyncing(false);
+  }, [activeRegion]);
+
+  // Notify backend about all pending regions
+  const notifyBackend = useCallback(async () => {
+    setIsNotifying(true);
+    try {
+      const res = await fetch("/api/notify", { method: "POST" });
+      const data = await res.json();
+      setIsNotifying(false);
+      return { notified: data.notified ?? false, message: data.message ?? "" };
+    } catch (err) {
+      console.error("Notify error:", err);
+      setIsNotifying(false);
+      return { notified: false, message: "Network error" };
+    }
+  }, []);
+
   return (
     <TopPicksContext.Provider
       value={{
@@ -319,6 +377,11 @@ export function TopPicksProvider({
         loadHistory,
         isRestoring,
         restoreVersion,
+        syncedAt,
+        isSyncing,
+        markAsLive,
+        isNotifying,
+        notifyBackend,
       }}
     >
       {children}

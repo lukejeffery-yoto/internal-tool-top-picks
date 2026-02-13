@@ -57,9 +57,20 @@ export function HistoryPanel({ onClose }: { onClose: () => void }) {
                 >
                   <div className="flex items-start justify-between">
                     <div>
-                      <p className="text-sm font-medium text-gray-900">
-                        {formatRelativeTime(version.publishedAt)}
-                      </p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-medium text-gray-900">
+                          {formatRelativeTime(version.publishedAt)}
+                        </p>
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${
+                            version.syncedAt
+                              ? "bg-green-100 text-green-700"
+                              : "bg-orange-100 text-orange-700"
+                          }`}
+                        >
+                          {version.syncedAt ? "Live" : "Pending"}
+                        </span>
+                      </div>
                       <p className="text-xs text-gray-500">
                         {version.productIds.length} picks
                         {version.publishedBy && ` by ${version.publishedBy}`}

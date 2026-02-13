@@ -23,6 +23,7 @@ export async function GET(
     publishedProductIds: latestPublished?.productIds ?? null,
     lastPublishedAt: latestPublished?.publishedAt ?? null,
     lastPublishedBy: latestPublished?.publishedBy ?? null,
+    syncedAt: latestPublished?.syncedAt ?? null,
   });
 }
 

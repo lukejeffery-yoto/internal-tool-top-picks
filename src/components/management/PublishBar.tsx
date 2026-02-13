@@ -14,8 +14,22 @@ export function PublishBar({ onOpenHistory }: { onOpenHistory: () => void }) {
     isLoading,
     publishPicks,
     selectedPicks,
+    syncedAt,
+    isSyncing,
+    markAsLive,
+    isNotifying,
+    notifyBackend,
   } = useTopPicks();
   const [showConfirm, setShowConfirm] = useState(false);
+  const [notifyMessage, setNotifyMessage] = useState<string | null>(null);
+
+  const handleNotify = async () => {
+    const result = await notifyBackend();
+    setNotifyMessage(result.message);
+    setTimeout(() => setNotifyMessage(null), 4000);
+  };
+
+  const isPublished = lastPublishedAt && !hasUnpublishedChanges;
 
   return (
     <>
@@ -34,6 +48,17 @@ export function PublishBar({ onOpenHistory }: { onOpenHistory: () => void }) {
               >
                 {hasUnpublishedChanges ? "Draft" : "Published"}
               </span>
+              {isPublished && (
+                <span
+                  className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                    syncedAt
+                      ? "bg-green-100 text-green-800"
+                      : "bg-orange-100 text-orange-800"
+                  }`}
+                >
+                  {syncedAt ? "Live" : "Pending Sync"}
+                </span>
+              )}
               <span className="text-xs text-gray-500">
                 {lastPublishedAt
                   ? `Last published ${formatRelativeTime(lastPublishedAt)}${lastPublishedBy ? ` by ${lastPublishedBy}` : ""}`
@@ -43,6 +68,25 @@ export function PublishBar({ onOpenHistory }: { onOpenHistory: () => void }) {
           )}
         </div>
         <div className="flex items-center gap-2">
+          {notifyMessage && (
+            <span className="text-xs text-gray-500">{notifyMessage}</span>
+          )}
+          <button
+            onClick={handleNotify}
+            disabled={isNotifying}
+            className="rounded-md px-3 py-1.5 text-xs font-medium text-indigo-600 hover:bg-indigo-50 disabled:opacity-50"
+          >
+            {isNotifying ? "Notifying..." : "Notify Backend"}
+          </button>
+          {isPublished && !syncedAt && (
+            <button
+              onClick={markAsLive}
+              disabled={isSyncing}
+              className="rounded-md border border-green-600 px-3 py-1.5 text-xs font-medium text-green-700 hover:bg-green-50 disabled:opacity-50"
+            >
+              {isSyncing ? "Syncing..." : "Mark as Live"}
+            </button>
+          )}
           <button
             onClick={onOpenHistory}
             className="rounded-md px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-100"
