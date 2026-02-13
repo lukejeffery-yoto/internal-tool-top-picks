@@ -11,6 +11,7 @@ export function PublishBar({ onOpenHistory }: { onOpenHistory: () => void }) {
     lastPublishedAt,
     lastPublishedBy,
     isPublishing,
+    isLoading,
     publishPicks,
     selectedPicks,
   } = useTopPicks();
@@ -20,20 +21,26 @@ export function PublishBar({ onOpenHistory }: { onOpenHistory: () => void }) {
     <>
       <div className="flex items-center justify-between border-b bg-white px-6 py-2">
         <div className="flex items-center gap-3">
-          <span
-            className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
-              hasUnpublishedChanges
-                ? "bg-amber-100 text-amber-800"
-                : "bg-green-100 text-green-800"
-            }`}
-          >
-            {hasUnpublishedChanges ? "Draft" : "Published"}
-          </span>
-          <span className="text-xs text-gray-500">
-            {lastPublishedAt
-              ? `Last published ${formatRelativeTime(lastPublishedAt)}${lastPublishedBy ? ` by ${lastPublishedBy}` : ""}`
-              : "Never published"}
-          </span>
+          {isLoading ? (
+            <span className="text-xs text-gray-400">Loading...</span>
+          ) : (
+            <>
+              <span
+                className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                  hasUnpublishedChanges
+                    ? "bg-amber-100 text-amber-800"
+                    : "bg-green-100 text-green-800"
+                }`}
+              >
+                {hasUnpublishedChanges ? "Draft" : "Published"}
+              </span>
+              <span className="text-xs text-gray-500">
+                {lastPublishedAt
+                  ? `Last published ${formatRelativeTime(lastPublishedAt)}${lastPublishedBy ? ` by ${lastPublishedBy}` : ""}`
+                  : "Never published"}
+              </span>
+            </>
+          )}
         </div>
         <div className="flex items-center gap-2">
           <button
