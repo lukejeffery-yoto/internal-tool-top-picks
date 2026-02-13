@@ -14,6 +14,13 @@ function getNotifyEmail(): string | null {
   return process.env.NOTIFY_EMAIL || null;
 }
 
+function getAppUrl(): string {
+  if (process.env.APP_URL) return process.env.APP_URL;
+  if (process.env.VERCEL_PROJECT_PRODUCTION_URL)
+    return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+  return "https://yoto-internal-tool-manual-curation.vercel.app";
+}
+
 async function sendEmail(
   to: string,
   subject: string,
@@ -62,10 +69,16 @@ export async function emailPendingRegions(
     })
     .join("");
 
+  const appUrl = getAppUrl();
+  const downloadUrl = `${appUrl}/api/picks/pending`;
+
   return sendEmail(
     notifyEmail,
     `Top Picks ready for sync (${versions.length} region${versions.length > 1 ? "s" : ""})`,
-    `<h3>Top Picks ready for sync</h3><ul>${rows}</ul><p>Please run the sync script, then mark each region as Live in the curation tool.</p>`
+    `<h3>Top Picks ready for sync</h3>
+<ul>${rows}</ul>
+<p><a href="${downloadUrl}">Download pending picks (JSON)</a></p>
+<p>Please run the sync script, then mark each region as Live in the <a href="${appUrl}">curation tool</a>.</p>`
   );
 }
 

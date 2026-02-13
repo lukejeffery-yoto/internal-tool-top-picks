@@ -2,6 +2,13 @@ import { PickVersion } from "./types";
 
 const SLACK_API = "https://slack.com/api";
 
+function getAppUrl(): string {
+  if (process.env.APP_URL) return process.env.APP_URL;
+  if (process.env.VERCEL_PROJECT_PRODUCTION_URL)
+    return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+  return "https://yoto-internal-tool-manual-curation.vercel.app";
+}
+
 function getToken(): string | null {
   return process.env.SLACK_BOT_TOKEN || null;
 }
@@ -41,7 +48,10 @@ export async function notifyChannelPendingRegions(
       return `• *${v.regionCode}* — ${v.productIds.length} picks, published by ${v.publishedBy || "unknown"} on ${date}`;
     });
 
-    const text = `🔔 *Top Picks ready for sync*\n\n${lines.join("\n")}\n\nPlease run the sync script, then mark each region as Live in the curation tool.`;
+    const appUrl = getAppUrl();
+    const downloadUrl = `${appUrl}/api/picks/pending`;
+
+    const text = `🔔 *Top Picks ready for sync*\n\n${lines.join("\n")}\n\n<${downloadUrl}|Download pending picks (JSON)>\n\nPlease run the sync script, then mark each region as Live in the <${appUrl}|curation tool>.`;
 
     const result = await slackPost("chat.postMessage", {
       channel: channelId,
