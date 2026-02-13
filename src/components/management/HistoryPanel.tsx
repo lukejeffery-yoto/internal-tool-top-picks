@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useTopPicks } from "@/context/TopPicksContext";
 import { formatRelativeTime } from "@/lib/format";
-import { copyIdsToClipboard, downloadIdsCsv } from "@/lib/export";
+import { copyIdsToClipboard, downloadIdsJson } from "@/lib/export";
 
 export function HistoryPanel({ onClose }: { onClose: () => void }) {
   const {
@@ -89,7 +89,7 @@ export function HistoryPanel({ onClose }: { onClose: () => void }) {
                         </button>
                         <button
                           onClick={() =>
-                            downloadIdsCsv(
+                            downloadIdsJson(
                               version.productIds,
                               activeRegion,
                               version.publishedAt.slice(0, 10)
@@ -97,7 +97,7 @@ export function HistoryPanel({ onClose }: { onClose: () => void }) {
                           }
                           className="rounded-md px-2 py-1 text-[11px] font-medium text-gray-500 hover:bg-gray-100"
                         >
-                          CSV
+                          JSON
                         </button>
                       </div>
                     </div>

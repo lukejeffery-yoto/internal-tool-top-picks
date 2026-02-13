@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useTopPicks } from "@/context/TopPicksContext";
-import { copyIdsToClipboard, downloadIdsCsv } from "@/lib/export";
+import { copyIdsToClipboard, downloadIdsJson } from "@/lib/export";
 
 export function PublishedIdsList() {
   const { publishedProductIds, activeRegion } = useTopPicks();
@@ -18,7 +18,7 @@ export function PublishedIdsList() {
   };
 
   const handleDownload = () => {
-    downloadIdsCsv(publishedProductIds, activeRegion);
+    downloadIdsJson(publishedProductIds, activeRegion);
   };
 
   return (
@@ -45,7 +45,7 @@ export function PublishedIdsList() {
             onClick={handleDownload}
             className="rounded-md px-2.5 py-1 text-xs font-medium text-gray-600 hover:bg-gray-200"
           >
-            Download CSV
+            Download JSON
           </button>
         </div>
       </div>
