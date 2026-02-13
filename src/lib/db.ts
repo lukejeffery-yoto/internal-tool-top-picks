@@ -6,6 +6,18 @@ function getDb() {
   return sql;
 }
 
+function parseProductIds(val: unknown): string[] {
+  if (Array.isArray(val)) return val;
+  if (typeof val === "string") {
+    try {
+      return JSON.parse(val);
+    } catch {
+      return [];
+    }
+  }
+  return [];
+}
+
 export async function ensureSchema() {
   const sql = getDb();
   await sql`
@@ -27,11 +39,16 @@ export async function ensureSchema() {
     CREATE TABLE IF NOT EXISTS pick_versions (
       id SERIAL PRIMARY KEY,
       region_code TEXT NOT NULL,
-      product_ids JSONB NOT NULL,
+      product_ids TEXT NOT NULL,
       note TEXT DEFAULT '',
       published_by TEXT DEFAULT '',
       published_at TIMESTAMPTZ DEFAULT NOW()
     )
+  `;
+  // Migrate column from JSONB to TEXT if table was created with old schema
+  await sql`
+    ALTER TABLE pick_versions
+    ALTER COLUMN product_ids TYPE TEXT USING product_ids::text
   `;
   await sql`
     CREATE INDEX IF NOT EXISTS idx_pick_versions_region
@@ -74,16 +91,17 @@ export async function publishPicks(
   publishedBy: string = ""
 ): Promise<PickVersion> {
   const sql = getDb();
+  const productIdsJson = JSON.stringify(productIds);
   const rows = await sql`
     INSERT INTO pick_versions (region_code, product_ids, note, published_by)
-    VALUES (${regionCode}, ${JSON.stringify(productIds)}::jsonb, ${note}, ${publishedBy})
+    VALUES (${regionCode}, ${productIdsJson}, ${note}, ${publishedBy})
     RETURNING id, region_code, product_ids, note, published_by, published_at
   `;
   const row = rows[0];
   return {
     id: row.id,
     regionCode: row.region_code,
-    productIds: row.product_ids,
+    productIds: parseProductIds(row.product_ids),
     note: row.note,
     publishedBy: row.published_by,
     publishedAt: row.published_at,
@@ -105,7 +123,7 @@ export async function getPickVersions(
   return rows.map((row) => ({
     id: row.id,
     regionCode: row.region_code,
-    productIds: row.product_ids,
+    productIds: parseProductIds(row.product_ids),
     note: row.note,
     publishedBy: row.published_by,
     publishedAt: row.published_at,
@@ -128,7 +146,7 @@ export async function getLatestPublishedPicks(
   return {
     id: row.id,
     regionCode: row.region_code,
-    productIds: row.product_ids,
+    productIds: parseProductIds(row.product_ids),
     note: row.note,
     publishedBy: row.published_by,
     publishedAt: row.published_at,

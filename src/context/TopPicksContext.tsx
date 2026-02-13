@@ -228,9 +228,12 @@ export function TopPicksProvider({
             ...prev,
             [activeRegion]: new Date().toISOString(),
           }));
+        } else {
+          const err = await res.json().catch(() => ({}));
+          console.error("Publish failed:", res.status, err);
         }
-      } catch {
-        // Silently fail
+      } catch (err) {
+        console.error("Publish error:", err);
       }
       setIsPublishing(false);
     },
