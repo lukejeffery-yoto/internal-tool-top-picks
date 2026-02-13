@@ -1,12 +1,16 @@
 import { Product } from "./types";
-import { mockProducts } from "./mock-products";
+import { RegionCode, mockProductsByRegion, regions } from "./mock-products";
 
-export async function getAllProducts(): Promise<Product[]> {
-  return mockProducts;
+export { regions, type RegionCode };
+
+export async function getProductsByRegion(
+  regionCode: RegionCode
+): Promise<Product[]> {
+  return mockProductsByRegion[regionCode] || [];
 }
 
-export async function getProductById(
-  id: string
-): Promise<Product | undefined> {
-  return mockProducts.find((p) => p.id === id);
+export async function getAllRegionProducts(): Promise<
+  Record<RegionCode, Product[]>
+> {
+  return mockProductsByRegion;
 }

@@ -1,13 +1,13 @@
-import { getAllProducts } from "@/lib/data";
+import { getAllRegionProducts, regions } from "@/lib/data";
 import { TopPicksProvider } from "@/context/TopPicksContext";
 import { ManagementPanel } from "@/components/management/ManagementPanel";
 import { PhonePreview } from "@/components/preview/PhonePreview";
 
 export default async function Home() {
-  const products = await getAllProducts();
+  const productsByRegion = await getAllRegionProducts();
 
   return (
-    <TopPicksProvider initialProducts={products}>
+    <TopPicksProvider regionList={regions} productsByRegion={productsByRegion}>
       <div className="flex h-screen">
         <div className="flex-1 overflow-y-auto border-r border-gray-200">
           <ManagementPanel />
